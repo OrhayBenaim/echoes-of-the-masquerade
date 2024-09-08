@@ -1,0 +1,15 @@
+.lobby {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.lobby__item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lobby__image {
+  width: 100px;
+}

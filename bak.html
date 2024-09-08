@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  </head>
+  <body>
+    <button id="host">Host</button>
+    <span>Your ID: <span id="room_id"></span></span>
+    <br />
+    <input type="text" id="join_id" />
+    <button id="submit">Join</button>
+    <button id="send">Send</button>
+
+    <ul id="players"></ul>
+
+    <script type="module">
+      import { faker } from "https://esm.sh/@faker-js/faker";
+      import { Host } from "./host.js";
+      import { Client } from "./client.js";
+
+      let host, client;
+      document.getElementById("host").addEventListener("click", () => {
+        host = new Host();
+        document.querySelector("#room_id").textContent = host.id;
+        host.onUpdate = (gameState) => {
+          const list = Object.entries(gameState.players).map(([id, player]) => {
+            return `<li id=${id}>${player.name}</li>`;
+          });
+          document.getElementById("players").innerHTML = list.join("");
+        };
+      });
+
+      document.getElementById("send").addEventListener("click", () => {
+        if (client) {
+          client.SendMessage("Hello!");
+        }
+        if (host) {
+          host.BroadcastMessage("Hello!");
+        }
+      });
+      document.getElementById("submit").addEventListener("click", () => {
+        const join_id =
+          sessionStorage.getItem("room_id") ||
+          document.getElementById("join_id").value;
+        sessionStorage.setItem("room_id", join_id);
+        client = new Client(join_id);
+        client.onUpdate = (gameState) => {
+          const list = Object.entries(gameState.players).map(([id, player]) => {
+            return `<li id=${id}>${player.name}</li>`;
+          });
+          document.getElementById("players").innerHTML = list.join("");
+        };
+      });
+    </script>
+  </body>
+</html>
