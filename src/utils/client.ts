@@ -1,17 +1,15 @@
 import { faker } from "@faker-js/faker";
 import { DataConnection, Peer } from "peerjs";
-import { GameState, Message } from "~/models/game";
+import { GameActionsMessage, GameState, Message } from "~/models/game";
 import { randomPlayer } from "./random";
+import { InitialState } from "~/store/game";
 
 export class Client {
   peer: Peer;
   connection: DataConnection | null = null;
   id: string = "";
   room_id: string = "";
-  gameState: GameState = {
-    players: {},
-    history: [],
-  };
+  gameState: GameState = InitialState;
   onUpdate = (gameState: GameState) => {};
 
   constructor() {
@@ -27,6 +25,10 @@ export class Client {
     });
   }
 
+  PlayAction(action: GameActionsMessage) {
+    this.SendMessage(action);
+  }
+
   Connect(room_id: string) {
     if (!this.id) return;
     this.connection = this.peer.connect(room_id);
@@ -36,19 +38,17 @@ export class Client {
       this.HandleMessage(message as Message)
     );
 
-    this.connection.on("open", () => {});
+    this.connection.on("open", () => {
+      this.SendMessage({
+        action: "join",
+        payload: randomPlayer(),
+      });
+    });
   }
 
   HandleMessage(message: Message) {
     if (message.action === "tick") {
       this.gameState = message.payload;
-
-      if (!this.gameState.players[this.id]) {
-        this.SendMessage({
-          action: "join",
-          payload: randomPlayer(),
-        });
-      }
     }
     this.onUpdate(this.gameState);
   }

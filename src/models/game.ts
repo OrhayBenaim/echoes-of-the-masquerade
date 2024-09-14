@@ -20,29 +20,31 @@ type PlayerAction =
   | {
       id: string;
       name: string;
-      type: Actions;
+      action: Actions;
       target: string;
     }
   | {
       id: string;
       name: string;
-      type: "listen";
+      action: "listen";
     }
   | {
       id: string;
       name: string;
-      type: "sleep";
+      action: "sleep";
     };
 
 export interface GameState {
   players: Record<string, Player>;
   history: PlayerAction[];
+  state: "waiting" | "started" | "ended";
+  currentTurn: string | null;
 }
 
-type GameActionsMessage =
+export type GameActionsMessage =
   | {
       action: Actions;
-      payload: string;
+      target: string;
     }
   | {
       action: "listen";
@@ -51,14 +53,15 @@ type GameActionsMessage =
       action: "sleep";
     };
 
-type EventMessage =
-  | {
-      action: "join";
-      payload: {
-        name: string;
-        image: string;
-      };
-    }
+export type JoinEvent = {
+  action: "join";
+  payload: {
+    name: string;
+    image: string;
+  };
+};
+export type EventMessage =
+  | JoinEvent
   | {
       action: "tick";
       payload: GameState;

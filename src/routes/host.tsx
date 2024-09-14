@@ -6,7 +6,7 @@ export default function HostScreen() {
   const host = new Host(store);
 
   host.onUpdate = (gameState) => {
-    setStore("players", gameState.players);
+    setStore(gameState);
   };
 
   return (
@@ -21,7 +21,28 @@ export default function HostScreen() {
       >
         Close
       </button>
+      {store.state === "waiting" && (
+        <button
+          onClick={() => {
+            host.StartGame();
+          }}
+        >
+          Start game
+        </button>
+      )}
+      {store.currentTurn === host.id && (
+        <button
+          onClick={() => {
+            host.PlayAction({
+              action: "listen",
+            });
+          }}
+        >
+          Take action
+        </button>
+      )}
       <h2>Players</h2>
+
       <Lobby players={store.players} playerId={host.id} />
     </main>
   );

@@ -9,7 +9,7 @@ export default function HostScreen() {
   const [room, setRoom] = createSignal(client.room_id);
 
   client.onUpdate = (gameState) => {
-    setStore("players", gameState.players);
+    setStore(gameState);
   };
 
   return (
@@ -41,6 +41,18 @@ export default function HostScreen() {
       >
         Disconnect
       </button>
+
+      {store.currentTurn === client.id && (
+        <button
+          onClick={() => {
+            client.PlayAction({
+              action: "listen",
+            });
+          }}
+        >
+          Take action
+        </button>
+      )}
 
       <h2>Players</h2>
       <Lobby players={store.players} playerId={client.id} />
